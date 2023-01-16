@@ -1,0 +1,28 @@
+{
+  "name": "flash-fiction",
+  "version": "1.0.0",
+  "description": "A short story sharing application ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sunny-64/Flash-Fiction.git"
+  },
+  "author": "Sunny",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sunny-64/Flash-Fiction/issues"
+  },
+  "homepage": "https://github.com/Sunny-64/Flash-Fiction#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.8.3",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^2.0.20"
+  }
+}
