@@ -1,0 +1,22 @@
+const mongoose = require("mongoose"); 
+
+const userSchema = new mongoose.Schema({
+    fullName : {type : String, default: ""}, 
+    email : {type : String, default : ""}, 
+    password : {type : String, default : ""}, 
+    countryCode : {type : String , default : ""},
+    mobile : {type : String, default : ""}, 
+
+    loginLogs : {
+        ip : {type : String, default : ""}, 
+        loginTime : {type : Date , default : Date.now()}, 
+        isLoggedInSuccessfully : {type : Boolean, default : false}
+    },
+    
+    status : {type : Boolean, default : true}, 
+    createdAt : {type : Date, default : Date.now()}, 
+    updatedAt : {type : Date, default : Date.now()}
+})
+
+
+module.exports = mongoose.model("User", userSchema); 
