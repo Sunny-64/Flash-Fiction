@@ -21,7 +21,7 @@ Admin.findOne({email : adminObj.email})
 .then(data => {
     if(data == null){
         let adminObj2 = new Admin(adminObj); 
-        adminObj.save()
+        adminObj2.save()
         .then(res => {
             console.log("Admin Registered successfully"); 
         })
