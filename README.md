@@ -3,9 +3,10 @@
 
 <h2>How to Setup the project:</h2>
 
-<blockquote>npm install</blockquote>
-<blockquote>npm install</blockquote>
-<blockquote>npm start</blockquote>
+```
+npm install
+npm start
+```
 
 
 
