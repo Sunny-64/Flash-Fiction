@@ -20,13 +20,16 @@ app.get("/", (req, res)=>{
     })
 })
 
-
-const adminRoutesPath = require("./routes/adminRoutes.js"); 
+// Admin Route
+const adminRoutesPath = require("./routes/admin_routes/adminRoutes.js"); 
 app.use("/admin", adminRoutesPath); 
 
+// User Route
+const userRoutePath = require("./routes/user_routes/userRoutes.js"); 
+app.use("/user", userRoutePath); 
 
 
-// Seeding admin everytime the project starts if admin doesn't exists
+// Seeding admin everytime the project starts.
 
 const seed = require("./common/seed"); 
 

@@ -1,5 +1,5 @@
 const router = require("express").Router(); 
-const categoryController = require("./../api/category/categoryController"); 
+const categoryController = require("../../api/category/categoryController"); 
 
 router.get("/admin", (req, res)=>{
     res.json({

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose"); 
 
 const userSchema = new mongoose.Schema({
-    fullName : {type : String, default: ""}, 
+    name : {type : String, default: ""}, 
     email : {type : String, default : ""}, 
     password : {type : String, default : ""}, 
     countryCode : {type : String , default : ""},
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     
     status : {type : Boolean, default : true}, 
     createdAt : {type : Date, default : Date.now()}, 
-    updatedAt : {type : Date, default : Date.now()}
+    updatedAt : {type : Date}
 })
 
 
