@@ -6,12 +6,11 @@ const dbConfig = require("./config/dbConfig");
 const app = express(); 
 const PORT = process.env.PORT; 
 
-// Middlewares
+// MIDDLEWARES
 app.use(express.urlencoded({extended : true})); 
 
 
-
-// // Routes
+// ROUTES
 app.get("/", (req, res)=>{
     res.json({
         status : 200, 
@@ -20,18 +19,20 @@ app.get("/", (req, res)=>{
     })
 })
 
-// Admin Route
+// ADMIN ROUTE
 const adminRoutesPath = require("./routes/admin_routes/adminRoutes.js"); 
 app.use("/admin", adminRoutesPath); 
 
-// User Route
+// USER ROUTE
 const userRoutePath = require("./routes/user_routes/userRoutes.js"); 
 app.use("/user", userRoutePath); 
 
 
-// Seeding admin everytime the project starts.
+// SEEDING ADMIN everytime the project starts.
 
 const seed = require("./common/seed"); 
+
+
 
 
 app.listen(PORT, function(){

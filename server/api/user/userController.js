@@ -1,6 +1,7 @@
 const User = require("./userModel");
 const Customer = require("./../customer/customerModel");
 const bcrypt = require("bcrypt");
+const { response } = require("express");
 
 exports.userRegister = (req, res) => {
   const userObj = new User();
@@ -75,3 +76,77 @@ exports.userRegister = (req, res) => {
     }
   });
 };
+
+exports.userLogin = (req, res) => {
+
+    const {email, password} = req.body; 
+ 
+    if(email === undefined || password === undefined){
+      res.json({
+        status : 400, 
+        success : false, 
+        message : "Email or password is incorrect"
+      })
+    }
+    User.findOne({email : email})
+    .then(response => {
+      if(response != null){
+        if(bcrypt.compareSync(password, response.password)){
+          let logObj = {
+            ip : req.ip,
+            isLoggedInSuccessfully : true,
+            loginTime : Date.now()
+          }
+          response.loginLogs.push(logObj)
+          response.save()
+          .then(data => {
+            res.json({
+              status : 200, 
+              success : true, 
+              message : "User Logged in Successfully", 
+              data : data
+            })
+          })
+          .catch(err => {      
+            res.json({
+              status : 400,
+              success : false, 
+              message : "Failed to save user logs",
+              error : err
+            })
+          })    
+        }
+        else{
+          let logObj = {
+            ip : req.ip,
+            isLoggedInSuccessfully : false,
+            loginTime : Date.now()
+          }
+          response.loginLogs.push(logObj)
+          response.save()
+          .then(data => {
+            res.json({
+              status : 400, 
+              success : false, 
+              message : "Email or password is wrong"
+            })
+          })
+        }
+      }
+      else{
+        res.json({
+          status : 400, 
+          success : false, 
+          message : "User does not exist"
+        })
+      }
+    })
+    .catch(err => {
+      res.json({
+        status : 400,
+        success : false, 
+        message : "Could not fetch User", 
+        error : err
+      })
+    })
+}

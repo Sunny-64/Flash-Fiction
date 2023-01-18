@@ -7,11 +7,11 @@ const userSchema = new mongoose.Schema({
     countryCode : {type : String , default : ""},
     mobile : {type : String, default : ""}, 
 
-    loginLogs : {
+    loginLogs : [{
         ip : {type : String, default : ""}, 
         loginTime : {type : Date , default : Date.now()}, 
-        isLoggedInSuccessfully : {type : Boolean, default : false}
-    },
+        isLoggedInSuccessfully : {type : Boolean}
+    }],
     
     status : {type : Boolean, default : true}, 
     createdAt : {type : Date, default : Date.now()}, 
