@@ -1,7 +1,7 @@
 const User = require("./userModel");
 const Customer = require("./../customer/customerModel");
 const bcrypt = require("bcrypt");
-const { response } = require("express");
+const jwt = require("jsonwebtoken"); 
 
 exports.userRegister = (req, res) => {
   const userObj = new User();
@@ -17,44 +17,26 @@ exports.userRegister = (req, res) => {
     country,
     state,
     address,
+    image, 
   } = req.body;
 
-  if(!(req.body)){
+  const favCategories = req.body.favCategories;
+  if(req.body == undefined){
     res.json({
-        status: 400,
-        success: false,
-        message: "Invalid data",
-      });
+          status: 400,
+          success: false,
+          message: "Invalid data",
+        });
   }
-  // const favCategories = req.body.favCategories;
-  // if (
-  //   name == undefined ||
-  //   email == undefined ||
-  //   password == undefined ||
-  //   mobile == undefined ||
-  //   countryCode == undefined ||
-  //   dob == undefined ||
-  //   country == undefined ||
-  //   state == undefined ||
-  //   address == undefined ||
-  //   gender == undefined
-  // ) {
-  //   res.json({
-  //     status: 400,
-  //     success: false,
-  //     message: "Invalid data",
-  //   });
-  // } else {
+  else {
     User.findOne({ email: email }).then((data) => {
       if (data == null) {
-        userObj.name = name;
-        userObj.email = email;
-        userObj.password = bcrypt.hashSync(password, 10); // breaks if password is not provided
-        userObj.mobile = mobile;
-        userObj.countryCode = countryCode;
-
-        userObj
-          .save()
+        userObj.name = name.trim();
+        userObj.email = email.trim();
+        userObj.password = bcrypt.hashSync(password.trim(), 10); 
+        userObj.mobile = mobile.trim();
+        userObj.countryCode = countryCode.trim();
+        userObj.save()
           .then((data) => {
             customerObj.userId = data._id;
             customerObj.name = data.name;
@@ -62,14 +44,36 @@ exports.userRegister = (req, res) => {
             customerObj.mobile = data.mobile;
             customerObj.countryCode = data.countryCode;
             customerObj.dob = dob;
-            customerObj.country = country;
-            customerObj.state = state;
-            customerObj.address = address;
-            customerObj.gender = gender;
+            customerObj.country = country.trim();
+            customerObj.state = state.trim();
+            customerObj.address = address.trim();
+            customerObj.gender = gender.trim();
             customerObj.favCategories = favCategories;
-            customerObj
-              .save()
+            // console.log(req.file.filename)
+            if(req.file !== undefined){
+
+              customerObj.profilePicture = req.file.filename === undefined ? "default-profile-icon.png" : req.file.filename; 
+            }
+            else{
+              customerObj.profilePicture = "default-profile-icon.png"
+            }
+            customerObj.save()
               .then((response) => {
+                jwt.sign(response.toJSON(), process.env.SECRET_KEY, (err, token) => {
+                  // console.log(token, err)
+                  if(err === null){
+                    req.headers.authorization = token; 
+                    console.log(token)
+                  }
+                  else{
+                    //handle error
+                    res.json({
+                      status : 401, 
+                      success : false, 
+                      message : "Unauthorized access"
+                    })
+                  }
+                }); 
                 res.json({
                   status: 200,
                   success: true,
@@ -87,11 +91,11 @@ exports.userRegister = (req, res) => {
               });
           })
           .catch((err) => {
+            // console.log(err);
             res.json({
               status: 400,
               success: false,
-              message: "Failed to save user",
-              error: err,
+              message: "Failed to save user " + err,
             });
           });
       } else {
@@ -102,7 +106,7 @@ exports.userRegister = (req, res) => {
         });
       }
     });
-  // }
+  }
 }
 
 exports.userLogin = (req, res) => {
@@ -175,3 +179,4 @@ exports.userLogin = (req, res) => {
       });
     });
 };
+

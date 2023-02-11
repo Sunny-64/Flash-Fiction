@@ -1,14 +1,13 @@
 require("dotenv").config(); 
-
 const express = require("express"); 
 const dbConfig = require("./config/dbConfig"); 
+const colors = require('colors')
 
 const app = express(); 
 const PORT = process.env.PORT; 
 
 // MIDDLEWARES
 app.use(express.urlencoded({extended : true})); 
-
 
 // ROUTES
 app.get("/", (req, res)=>{
@@ -20,21 +19,29 @@ app.get("/", (req, res)=>{
 })
 
 // ADMIN ROUTE
-const adminRoutesPath = require("./routes/admin_routes/adminRoutes.js"); 
+const adminRoutesPath = require("./routes/adminRoutes.js"); 
 app.use("/admin", adminRoutesPath); 
 
 // USER ROUTE
-const userRoutePath = require("./routes/user_routes/userRoutes.js"); 
-app.use("/user", userRoutePath); 
+const userRoutesPath = require("./routes/userRoutes.js"); 
+app.use("/user", userRoutesPath); 
+
+// CUSTOMER ROUTE
+const customerRoutesPath = require("./routes/customerRoutes"); 
+app.use("/customer",customerRoutesPath)
+
+// POST ROUTE
+const postRoutesPath = require("./routes/postRoutes");
+app.use("/post", postRoutesPath); 
 
 
 // SEEDING ADMIN everytime the project starts.
-
 const seed = require("./common/seed"); 
-
+// Seeding dummy users
+const SeedDummyUser = require("./common/seedDummyUsers"); 
 
 
 
 app.listen(PORT, function(){
-    console.log("SERVER RUNNING AT PORT -> ", PORT);
+    console.log(`SERVER RUNNING AT PORT -> ${PORT} `.bgGreen.bold);
 })

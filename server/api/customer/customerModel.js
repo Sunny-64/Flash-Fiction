@@ -2,31 +2,28 @@ const mongoose = require("mongoose");
 
 const customerSchema = new mongoose.Schema({
     userId : {type : mongoose.Schema.Types.ObjectId},
-    name : {type : String, default : ""}, 
-    email : {type : String, default : ""}, 
-    countryCode : {type : String, default : ""},
-    mobile : {
-        type : String, 
-        default : "", 
-        isPrivate : {type : Boolean, default : false}
-    },
-    dob : {
-        type : Date, 
-        isPrivate : {type : Boolean, default : false}
-    }, 
-    gender : {type : String, default : ""},
-    state : {type : String, default : ""}, 
-    country : {type : String, default : ""}, 
-    address : {
-        type : String, 
-        default : "",
-        isPrivate : {type : Boolean, default : false}    
-    }, 
+    profilePicture : {type : String, default : "default-profile-icon.png"}, 
+    name : {type : String, required : true}, 
+    email : {type : String, required : true, unique : true}, 
+    countryCode : {type : String, required : true},
+    mobile : {type : String, required : true, unique : true},
+    dob : {type : Date}, 
+    gender : {type : String, required : true},
+    state : {type : String, required : true}, 
+    country : {type : String, required : true}, 
+    address : {type : String, required : true}, 
     numberOfPosts : {type : Number, default : 0},
-    favCategories : [{categoryId : mongoose.Schema.Types.ObjectId}], 
+    favCategories : [mongoose.Schema.Types.ObjectId], 
     followingCount : {type : Number, default : 0}, 
     followerCount : {type : Number, default : 0}, 
-    readingListCount : {type : Number, default : 0}
+    reportsCount : {type : Number, default : 0},
+    readingListCount : {type : Number, default : 0},
+
+    isBlocked : {type : Boolean, default : false}, 
+
+    createdAt : {type : Date, default : Date.now()},
+    updatedAt : {type : Date},
+    // updatedBy : {type : }
 })
 
 module.exports = mongoose.model("Customer", customerSchema); 
