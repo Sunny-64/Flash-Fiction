@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
         loginTime : {type : Date , default : Date.now()}, 
         isLoggedInSuccessfully : {type : Boolean}
     }],
-    
+    isVerified : {type : Boolean, default : false},
+    isBlocked : {type : Boolean, default : false},
     status : {type : Boolean, default : true}, 
     createdAt : {type : Date, default : Date.now()}, 
     updatedAt : {type : Date}

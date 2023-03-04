@@ -7,63 +7,57 @@ const fs = require("fs");
 const path = require("path");
 // Universal
 
-exports.showAllCustomers = (req, res) => {
-  Customer.find({ isBlocked: false })
-    .then((data) => {
-      if (data != null) {
-        res.json({
-          status: 200,
-          success: true,
-          message: "Successfully fetched all users",
-          total_results: data.length,
-          data: data,
-        });
-      }
-    })
-    .catch((err) => {
+exports.showAllCustomers = async (req, res) => {
+  try{
+    const customersData = await Customer.find({ isBlocked: false }); 
+    const total_results = await Customer.find({ isBlocked: false }).countDocuments(); 
+    if (customersData != null) {
       res.json({
-        status: 400,
-        success: false,
-        message: "Error while fetching users",
-        error: err,
+        status: 200,
+        success: true,
+        message: "Successfully fetched all users",
+        total_results: total_results,
+        data: customersData,
       });
-    });
+    }
+    else{
+      res.json({
+        status : 404, 
+        success : false, 
+        message : "Customers not found", 
+      })
+    }
+  }catch(err){
+    res.json({
+      status : 500, 
+      success : false, 
+      message : "error " + err
+    })
+  }
 };
 
-exports.showSingleCustomer = (req, res) => {
+exports.showSingleCustomer = async (req, res) => {
   const customerId = req.params.customerId;
-  Customer.findOne({ _id: customerId })
-    .then((data) => {
-      if (data != null) {
-        res.json({
-          status: 200,
-          success: true,
-          message: "Successfully fetched User",
-          total_results: data.length,
-          data: data,
-        });
-      } else {
-        res.json({
-          status: 400,
-          success: true,
-          message: "User id missing",
-        });
-      }
-    })
-    .catch((err) => {
-      res.json({
-        status: 400,
-        success: false,
-        message: "Error while fetching user",
-        error: err,
-      });
-    });
-};
+  try{
+    const customer = await Customer.findOne({ _id: customerId }); 
+    if(customer === null){
+      res.json({status : 400, success : false, messsage : "User does not exist"}); 
+    }
+    else{
+      res.json({status : 200, success : true, message : "customer found", data : customer}); 
+    }
+    
+  }
+  catch(err){
+    res.json({status : 500, success : false, error : err.message}); 
+  }
+}
 
+// never delete the user ** this api is for testing purposes 
 // delete customer
 exports.deleteCustomer = async (req, res) => {
   // user and customer both will be deleted from here
-  const customerId = req.params.customerId;
+  const customerId = req.decodedUser._id;
   try {
     const customerData = await Customer.findOne({ _id: customerId });
     if (customerData === null) {
@@ -123,7 +117,6 @@ exports.updateCustomer = async (req, res) => {
     state,
     country,
     address,
-    customerId,
   } = req.body;
   if (req.body === undefined) {
     res.json({
@@ -133,7 +126,7 @@ exports.updateCustomer = async (req, res) => {
     });
   } else {
     try {
-      const customerData = await Customer.findOne({ _id: customerId });
+      const customerData = await Customer.findOne({ _id: req.decodedUser._id });
       if (customerData === null) {
         res.json({
           status: 404,
@@ -190,7 +183,8 @@ exports.updateCustomer = async (req, res) => {
 // follow
 
 exports.followCustomer = async (req, res) => {
-  const { followedTo, followedBy } = req.body;
+  const followedBy = req.decodedUser._id
+  const { followedTo } = req.body;
   if (followedBy === followedTo) {
     res.json({
       status: 400,
@@ -280,7 +274,8 @@ exports.followCustomer = async (req, res) => {
 };
 
 exports.unfollowCustomer = async (req, res) => {
-  const {customerId, unfollowCustomerId} = req.body; 
+  const customerId = req.decodedUser._id; 
+  const {unfollowCustomerId} = req.body; 
   if(customerId === unfollowCustomerId){
     res.json({
       status : 400, 
@@ -326,139 +321,124 @@ exports.unfollowCustomer = async (req, res) => {
   }
 }
 }
+
+// reading list / wishlist
+
 // block other users
 
 // report user
 
-// reading list / wishlist
-
 // only for Admin
 
-exports.blockCustomer = (req, res) => {
+exports.blockCustomer = async (req, res) => {
   const customerId = req.body.customerId;
-  if (customerId == undefined) {
-    res.json({
-      status: 200,
-      success: true,
-      message: "Provide customer id",
-    });
-  } else {
-    Customer.findOne({ _id: customerId })
-      .then((data) => {
-        if (data != null) {
-          data.isBlocked = true;
-          data
-            .save()
-            .then((response) => {
-              User.findOne({ _id: response.userId })
-                .then((userData) => {
-                  if (userData != null) {
-                    userData.status = false;
-                    res.json({
-                      status: 200,
-                      success: true,
-                      message: "Successfully blocked the customer",
-                      total_results: data.length,
-                      data: data,
-                    });
-                  } else {
-                    res.json({
-                      status: 200,
-                      success: true,
-                      message: "No Data found.",
-                    });
-                  }
-                })
-                .catch((err) => {
-                  res.json({
-                    status: 400,
-                    success: false,
-                    message: "There was an error",
-                    error: err,
-                  });
-                });
-            })
-            .catch((err) => {
-              res.json({
-                status: 400,
-                success: false,
-                message: "There was an error",
-                error: err,
-              });
-            });
-        } else {
-          res.json({
-            status: 200,
-            success: true,
-            message: "No Data found.",
-          });
-        }
-      })
-      .catch((err) => {
-        res.json({
-          status: 400,
-          success: false,
-          message: "There was an error",
-          error: err,
-        });
+  try{
+    if (customerId == undefined) {
+      res.json({
+        status: 200,
+        success: true,
+        message: "Provide customer id",
       });
+    }
+    else{
+      const customerData = await Customer.findOne({ _id: customerId });
+      if(customerData !== null){
+        const userData = await User.findOne({_id : customerData.userId}); 
+        if(userData !== null){
+          userData.status = false; 
+          userData.isBlocked = true; 
+          customerData.status = false;  
+          customerData.isBlocked = true; 
+          const updatedUser = await userData.save(); 
+          const updatedCustomer = await customerData.save(); 
+          res.json({
+            status : 200, 
+            success : true, 
+            message : "Successfully blocked the user", 
+            data : updatedCustomer
+          })
+        }
+        else{
+          res.json({
+            status : 404, 
+            success : false, 
+            message : "User not found"
+          })
+        }
+      }
+      else{
+        res.json({
+          status : 404, 
+          success : false, 
+          message : "user not found"
+        })
+      }
+    }
+  } 
+  catch(err){
+    res.json({
+      status : 500, 
+      success : false, 
+      message : "There was an error"
+    })
   }
 };
 
-exports.getBlockedCustomers = (req, res) => {
-  Customer.find({ isBlocked: true })
-    .then((data) => {
-      if (data != null) {
-        res.json({
-          status: 200,
-          success: true,
-          message: "Successfully Fetched All blocked customers",
-          total_results: data.length,
-          data: data,
-        });
-      } else {
-        res.json({
-          status: 200,
-          success: true,
-          message: "No Data found.",
-        });
-      }
-    })
-    .catch((err) => {
-      res.json({
-        status: 400,
-        success: false,
-        message: "There was an error while fetching customers",
-        error: err,
+exports.getBlockedCustomers = async (req, res) => {
+  try{
+    const blockedCustomers = await Customer.find({ isBlocked: true }); 
+    const total_results = await Customer.find({ isBlocked: true }).countDocuments();
+    if(blockedCustomers === null){
+      res.json({status: 400, success: true,
+        message: "No Data found.",
       });
-    });
-};
+    }
+    else{
+      res.json({
+        status : 200, success : true, 
+        message : "Blocked customers list", 
+        total_results : total_results,
+        data : blockedCustomers, 
+      })
+    }
+  }
+  catch(err){
+    console.log(err); 
+    res.json({
+      status : 500, 
+      success : false, 
+      message : err
+    })
+  }
+}
 
-exports.getAllCustomers = (req, res) => {
-  Customer.find()
-    .then((data) => {
-      if (data != null) {
-        res.json({
-          status: 200,
-          success: true,
-          message: "Successfully Fetched All blocked customers",
-          total_results: data.length,
-          data: data,
-        });
-      } else {
-        res.json({
-          status: 200,
-          success: true,
-          message: "No Data found.",
-        });
-      }
-    })
-    .catch((err) => {
+exports.getAllCustomers = async (req, res) => {
+  try{
+    const getCustomers = await Customer.find()
+    const total_results = await Customer.countDocuments(); 
+    if(getCustomers !== null){
+      res.json({
+        status: 200,
+        success: true,
+        message: "Successfully Fetched All blocked customers",
+        total_results: total_results,
+        data: getCustomers,
+      });
+    }
+    else {
       res.json({
         status: 400,
-        success: false,
-        message: "There was an error while fetching customers",
-        error: err,
+        success: true,
+        message: "No Data found.",
       });
-    });
-};
+    }
+  }
+  catch(err){
+    console.log(err) 
+    res.json({
+      status : 500, 
+      success : false, 
+      message : "error " + err
+    })
+  }
+}

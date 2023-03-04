@@ -29,6 +29,7 @@ router.get("/", (req, res) => {
 
 router.post("/register", upload.single("profilePicture"), userController.userRegister);
 router.post("/login", userController.userLogin);
+router.get("/verify/:email", userController.verify);
 
 module.exports = router; 
 

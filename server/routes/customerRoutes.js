@@ -1,6 +1,7 @@
 const router = require("express").Router(); 
-const customerController = require("../api/customer/customerController")
-const postController = require("./../api/post/postController")
+const customerController = require("../api/customer/customerController");
+const postController = require("./../api/post/postController"); 
+const readingListController = require("./../api/readingList/readingListController"); 
 
 const multer = require("multer"); 
 const path = require("path"); 
@@ -21,11 +22,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage : storage});
 
-// router.use(require("./../middlewares/auth"));
+router.use(require("./../middlewares/auth"));
+
 // customer
 router.get("/show/all", customerController.showAllCustomers); 
 router.get("/show/single/:customerId", customerController.showSingleCustomer); 
+// for testing use
 router.delete("/delete/:customerId", customerController.deleteCustomer); 
+
 router.patch("/update", customerController.updateCustomer);
 
 // Posts
@@ -36,6 +40,12 @@ router.patch("/post/update/:postId", upload.single("coverImage"), postController
 // Follow
 router.post("/follow", customerController.followCustomer); 
 router.post("/unfollow", customerController.unfollowCustomer);
+
+// reading list
+router.post("/wishlist/create", readingListController.createReadingList); 
+router.get("/wishlists", readingListController.showReadingListsOfACustomer); 
+router.post("/wishlist/story/add", readingListController.addItemInReadingList); 
+router.post("/wishlist/story/remove", readingListController.removeItemFromReadingList); 
 
 router.get("*", (req, res)=>{
     res.json({

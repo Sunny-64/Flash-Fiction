@@ -1,4 +1,3 @@
-// require("dotenv").config();
 const jwt = require("jsonwebtoken"); 
 
 module.exports = (req, res, next) => {
@@ -11,7 +10,7 @@ module.exports = (req, res, next) => {
         })
     }
     else{
-        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, function(err, decoded){
+        jwt.verify(token, process.env.ADMIN_TOKEN_SECRET_KEY, function(err, decoded){
             if(err){
                 res.json({
                     status : 401, 
@@ -20,7 +19,7 @@ module.exports = (req, res, next) => {
                 })
             }
             else{
-                req.decodedUser = decoded; 
+                req.decodedAdmin = decoded; 
                 next(); 
             }
         })

@@ -15,6 +15,14 @@ exports.addCategory = (req, res) => {
   }
 
   categoryObj.name = name.toLowerCase();
+  if(req.file === undefined){
+    res.json({
+      status : 400, 
+      success : false, 
+      message : "Please provide category image"
+    })
+  }
+  else{
   categoryObj.image = req.file.filename;
 
   Category.findOne({ name: name })
@@ -45,6 +53,7 @@ exports.addCategory = (req, res) => {
         error: "There was an error " + err,
       });
     });
+  }
 };
 
 exports.showAllCategory = (req, res) => {

@@ -11,7 +11,8 @@ const userObj = new User({
     email : "DummyUser@1gmail.com",
     password : bcrypt.hashSync("1234", 10),
     mobile : "79846235",
-    countryCode : "+91"
+    countryCode : "+91",
+    isVerified : true
 })
 
 User.findOne({ email: userObj.email })
@@ -56,7 +57,9 @@ const userObj2 = new User({
     email : "DummyUser@2gmail.com",
     password : bcrypt.hashSync("1234", 10),
     mobile : "798462354",
-    countryCode : "+91"
+    countryCode : "+91",
+    isVerified : true
+
 })
 
 User.findOne({ email: userObj2.email })
@@ -101,7 +104,9 @@ const userObj3 = new User({
     email : "DummyUser@3gmail.com",
     password : bcrypt.hashSync("1234", 10),
     mobile : "988462354",
-    countryCode : "+91"
+    countryCode : "+91", 
+    isVerified : true
+
 })
 
 User.findOne({ email: userObj3.email })

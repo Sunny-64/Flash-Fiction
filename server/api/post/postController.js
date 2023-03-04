@@ -7,7 +7,9 @@ const fs = require("fs");
 // Add Post
 exports.addPost = async (req, res) => {
   // , coverImage
-  const { title, story, description, categoryId, customerId } = req.body;
+  const customerId = req.decodedUser._id
+  const { title, story, description, categoryId } = req.body;
+  // console.log(customerId)
   if (req.body === undefined) {
     res.json({
       status: 400,
@@ -20,15 +22,15 @@ exports.addPost = async (req, res) => {
   postObj.title = title;
   postObj.story = story;
   postObj.description = description;
-  // postObj.coverImage = coverImage
   postObj.categoryId = categoryId;
   postObj.customerId = customerId;
-  postObj.coverImage = req.file.filename === undefined ? "" : req.file.filename;
+  // postObj.coverImage = req.file.filename === undefined ? "" : req.file.filename;
   try {
     // Save post
     const post = await postObj.save();
     // find the owner of the post
     const customer = await Customer.findOne({ _id: customerId });
+    // console.log(customer)
     if (customer === null) {
       res.json({
         status: 404,
@@ -57,6 +59,7 @@ exports.addPost = async (req, res) => {
 };
 
 // Delete a post
+// add customer verification
 exports.deletePost = async (req, res) => {
   const postId = req.params.postId;
   try {
@@ -180,7 +183,9 @@ exports.showSinglePost = async (req, res) => {
 // post update api
 
 exports.updatePost = async (req, res) => {
-  const { title, story, description, categoryId, customerId } = req.body;
+
+  const customerId = req.decodedUser._id
+  const { title, story, description, categoryId } = req.body;
   if (req.body === undefined || req.body === null) {
     res.json({
       status: 400,
@@ -244,7 +249,9 @@ exports.updatePost = async (req, res) => {
 
 // Add Review to a post
 exports.postReview = async (req, res) => {
-  const { rating, review, customerId, postId} = req.body;
+
+  const customerId = req.decodedUser._id
+  const { rating, review, postId} = req.body;
 
   if (rating === undefined && review === undefined) {
     res.json({
@@ -433,7 +440,7 @@ exports.updateReview = async (req, res) => {
   }
 }
 // Review Delete
-
+// customer verification ?
 exports.deleteReview = async (req, res) => {
   const reviewId = req.params.reviewId
   try{
@@ -473,7 +480,5 @@ exports.deleteReview = async (req, res) => {
 //  #admin controls
 
 // post block api
-
-// post delete api
 
 // post share * after making chatting collection

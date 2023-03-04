@@ -1,15 +1,5 @@
-const mongoose = require("mongoose"); 
 const bcrypt = require("bcrypt"); 
-
-
-const adminSchema = new mongoose.Schema({
-    email : {type : String},
-    password : {type : String}, 
-    isAdmin : {type : Boolean, default : true}, 
-    createdAt : {type : Date, default : Date.now()}
-}); 
-
-const Admin = mongoose.model("Admin", adminSchema); 
+const Admin = require("./../api/admin/adminModel"); 
 
 const adminObj = new Admin({
     email : process.env.ADMIN_EMAIL, 

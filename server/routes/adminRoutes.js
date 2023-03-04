@@ -1,6 +1,7 @@
 const router = require("express").Router(); 
 const categoryController = require("./../api/category/categoryController"); 
 const customerController = require("./../api/customer/customerController"); 
+const adminController = require("./../api/admin/adminController"); 
 const multer = require("multer"); 
 const path = require("path"); 
 const fs = require("fs");
@@ -29,6 +30,9 @@ router.get("/admin", (req, res)=>{
     })
 })
 
+router.post("/login", adminController.adminLogin); 
+
+router.use(require("./../middlewares/adminAuth")); 
 // Category CRUD
 router.post("/category/add", upload.single("image"), categoryController.addCategory); 
 router.get("/category/show/all", categoryController.showAllCategory);

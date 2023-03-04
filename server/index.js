@@ -1,4 +1,5 @@
-require("dotenv").config(); 
+const dotenv = require("dotenv"); 
+dotenv.config();
 const express = require("express"); 
 const dbConfig = require("./config/dbConfig"); 
 const colors = require('colors')
@@ -8,7 +9,6 @@ const PORT = process.env.PORT;
 
 // MIDDLEWARES
 app.use(express.urlencoded({extended : true})); 
-
 // ROUTES
 app.get("/", (req, res)=>{
     res.json({
