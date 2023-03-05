@@ -42,10 +42,17 @@ router.post("/follow", customerController.followCustomer);
 router.post("/unfollow", customerController.unfollowCustomer);
 
 // reading list
+
+// creates a new reading list
 router.post("/wishlist/create", readingListController.createReadingList); 
-router.get("/wishlists", readingListController.showReadingListsOfACustomer); 
+// shows all the reading lists of the user
+router.get("/wishlists", readingListController.showReadingListsOfACustomer);
+// deletes the reading list 
+router.delete("/wishlist/delete", readingListController.deleteReadingList); 
+// add stories in the reading list
 router.post("/wishlist/story/add", readingListController.addItemInReadingList); 
-router.post("/wishlist/story/remove", readingListController.removeItemFromReadingList); 
+// remove stories from the list
+router.delete("/wishlist/story/remove", readingListController.removeItemFromReadingList); 
 
 router.get("*", (req, res)=>{
     res.json({

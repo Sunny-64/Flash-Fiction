@@ -3,7 +3,6 @@ const ReadingList = require("./readingListModel");
 
 exports.createReadingList = async (req, res) => {
   const customerId = req.decodedUser._id;
-  // console.log(customerId)
   const { listName } = req.body;
 
   try {
@@ -25,7 +24,7 @@ exports.createReadingList = async (req, res) => {
 
       // update the reading list count
       customer.readingListCount += 1;
-      const increaseReadingListCountInCustomer = await customer.save();
+      await customer.save();
       res.json({
         status: 200,
         success: true,
@@ -60,7 +59,31 @@ exports.showReadingListsOfACustomer = async (req, res) => {
   }
 };
 
+exports.deleteReadingList = async (req, res) => {
+  const customerId = req.decodedUser._id; 
+  const {listId} = req.body; 
+  try{
+    const customer = await Customer.findOne({_id : customerId}); 
+    if(customer === null){
+      res.json({status : 400, success : false, message : "Customer not found"}); 
+    }
+    else{
+      const readingList = await ReadingList.findOne({_id : listId}); 
+      if(readingList === null){
+        res.json({status : 404, success : false, message : "Reading list not found"}); 
+      }
+      else{
+        const deleteList = await ReadingList.deleteOne({_id : listId}); 
+        res.json({status : 200, success : true, message : "List deleted successfully"});
+      }
+    }
+  }catch(err){
+    res.json({status : 500, success : false, error : err.message}); 
+  }
+}
 
+
+// stories items
 exports.addItemInReadingList = async (req, res) => {
   const customerId = req.decodedUser._id;
   const { storyId, listId } = req.body;
@@ -79,6 +102,9 @@ exports.addItemInReadingList = async (req, res) => {
         res.json({ status: 404, success: false, message: "List not found" });
       } else {
         // list obj
+        const storyExists = await readingList.stories.find(story => story.storyId.equals(storyId)); 
+        if(!storyExists){
+        
         const listItemObj = {
           storyId: storyId,
           addedOn: Date.now(),
@@ -95,6 +121,10 @@ exports.addItemInReadingList = async (req, res) => {
           data: saveReadingList,
         });
       }
+      else{
+        res.json({status : 400, success : false, message : "Story already exists"});
+      }
+      }
     }
   } catch (err) {
     res.json({ status: 500, success: false, error: err.message });
@@ -103,11 +133,8 @@ exports.addItemInReadingList = async (req, res) => {
 
 exports.removeItemFromReadingList = async (req, res) => {
   const customerId = req.decodedUser._id; 
-
   const {storyId, listId} = req.body; 
-  
   try{
-    // does not delete
     const readingList = await ReadingList.findOne({_id : listId}); 
     const readingListItem = await ReadingList.aggregate([
       {
@@ -116,7 +143,7 @@ exports.removeItemFromReadingList = async (req, res) => {
         }
       }, {
         '$match': {
-          'stories._id': storyId
+          'stories.storyId': storyId
         }
       }
     ])
@@ -124,7 +151,6 @@ exports.removeItemFromReadingList = async (req, res) => {
       res.json({status : 404, success : false, message : "item not found"}); 
     }
     else{
-      // pending 
       const deleteItem = await ReadingList.updateOne(
         { _id : listId}, 
         {$pull : {stories : {storyId : storyId}},  $inc : {totalItems : -1}}
